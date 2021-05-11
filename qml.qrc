@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>MediaButton.qml</file>
+        <file>MediaControl.qml</file>
+        <file>main.qml</file>
+        <file>Images</file>
+    </qresource>
+</RCC>
