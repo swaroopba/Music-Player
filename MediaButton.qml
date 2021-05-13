@@ -14,11 +14,15 @@ Rectangle
     property string clickedBgColor: "black"
     property string releasedBgColor: "red"
 
+    onItemWidthChanged: console.log("changed button width->"+itemWidth)
+
     signal clicked;
+
+    scale: (itemWidth < 100) ? itemWidth/90 : 1
 
     radius: button.imageWidth
     width:  button.itemWidth
-    height: button.itemHeight
+    height: button.itemWidth
     color: (clickContainer.pressed === true) ? button.clickedBgColor : button.releasedBgColor
 
     Text

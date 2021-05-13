@@ -4,5 +4,6 @@
         <file>MediaControl.qml</file>
         <file>main.qml</file>
         <file>Images</file>
+        <file>DisplayScreen.qml</file>
     </qresource>
 </RCC>

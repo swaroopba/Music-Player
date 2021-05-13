@@ -10,12 +10,19 @@ ColumnLayout
     property int mediaHeight: 20
     property int loopCount: 0
 
-    property double durationSliderValue: 0;
+    property double durationSliderValue: 0
+
+//    property string titleName: ""
+//    property string authorName: ""
 
     property bool isPlaying: false;
 
     width: mediaController.mediaWidth
     height: mediaController.mediaHeight
+
+    onMediaHeightChanged: console.log("Changed ht->"+mediaHeight)
+    onMediaWidthChanged: console.log("Changed wt->"+mediaWidth)
+    //onTitleNameChanged: console.log("Changed title"+ titleName)
 
 
     Timer
@@ -26,7 +33,7 @@ ColumnLayout
         {
             if (running == false)
             {
-                console.log("timer destroted")
+                //console.log("timer destroted")
                 if (volumeSlider.pressed === true)
                 {
                     volumeTimer.restart()
@@ -78,14 +85,20 @@ ColumnLayout
         anchors
         {
             left: parent.left
-            top: parent.top
             right: parent.right
-            verticalCenter: topRow.verticalCenter
         }
+
 
         Slider
         {
             id: durationSlider
+
+            anchors
+            {
+                //left: parent.left
+                //right: parent.right
+                verticalCenter: topRow.verticalCenter
+            }
 
             minimumValue: 0
             value: durationSliderValue
@@ -105,37 +118,24 @@ ColumnLayout
 
     RowLayout
     {
-        //anchors.fill: parent
         id: bottomRow
 
-        width: parent.width
-        height: parent.height/2
-        spacing: 10
+        width: mediaController.mediaWidth
+        height: mediaController.mediaHeight/2
+        spacing: mediaController.mediaWidth/1000
 
-        anchors
-        {
-            horizontalCenter: parent.horizontalCenter
-            //top: topRow.bottom
-            bottom: parent.bottom
-        }
-
-
-        Item
-        {
-            width: 3 * mediaWidth/10
-            height: parent.height
-        }
+        anchors.horizontalCenter: parent.horizontalCenter
 
         MediaButton
         {
-            itemWidth: mediaWidth/10
+            itemWidth: mediaWidth/11
             itemHeight: parent.height
             imgSrc: "Images/shuffle_light.png"
         }
 
         MediaButton
         {
-            itemWidth: mediaWidth/10
+            itemWidth: mediaWidth/11
             itemHeight: parent.height
             imgSrc: "Images/previous.png"
         }
@@ -144,7 +144,7 @@ ColumnLayout
         {
             id: playButton
 
-            itemWidth: mediaWidth/10
+            itemWidth: mediaWidth/11
             itemHeight: parent.height
             imgSrc: isPlaying ? "Images/pause.png" :"Images/play.png"
 
@@ -155,9 +155,12 @@ ColumnLayout
                 if (playingState === "Stopped")
                 {
                     MediaHandler.setFileName("Pokemon.mp3")
+                    //authorName = MediaHandler.getAuthorName()
+                    //titleName = MediaHandler.getTitleName()
+
                     playingDuration = MediaHandler.getDuration()
 
-                    console.log("Playing Duration->"+playingDuration)
+                    //console.log("Playing Duration->"+playingDuration)
 
                     //durationSlider.maximumValue = playingDuration
                     MediaHandler.playAudio()
@@ -178,7 +181,7 @@ ColumnLayout
 
         MediaButton
         {
-            itemWidth: mediaWidth/10
+            itemWidth: mediaWidth/11
             itemHeight: parent.height
             imgSrc: "Images/next.png"
         }
@@ -187,7 +190,7 @@ ColumnLayout
         {
             id: loopButton
 
-            itemWidth: mediaWidth/10
+            itemWidth: mediaWidth/11
             itemHeight: parent.height
             imgSrc: "Images/repeat_%1.png".arg(loopCount)
 
@@ -198,21 +201,68 @@ ColumnLayout
             }
         }
 
-        Item
+    }
+
+
+        ColumnLayout
         {
-            width: bottomRow.width/2 - 3 * soundButton.imageWidth
-            height: parent.height
-        }
+
+            width: mediaWidth/11
+            height: mediaController.height
+            anchors
+            {
+
+                right: mediaController.right
+                top: topRow.top
+                rightMargin: 10
+            }
+
+            Item
+            {
+                height: mediaController.height - bottomRow.height
+                width: soundButton.width
+                visible: !volumeRect.visible
+            }
+
+            Rectangle
+            {
+                id: volumeRect
+
+                anchors.bottom: soundButton.top
+
+                width: soundButton.itemWidth
+                height: topRow.height + (bottomRow.height/2 - soundButton.height/2)
+                color: "black"
+                visible: false
+
+                Slider
+                {
+                    id: volumeSlider
+
+                    width: parent.width
+                    height: parent.height
+                    minimumValue: 0
+                    maximumValue: 100
+                    value: 50
+                    orientation: 0
+
+                    onValueChanged:
+                    {
+                        MediaHandler.setAudioVolume(value)
+                    }
+                }
+            }
 
         MediaButton
         {
             id: soundButton
 
-            anchors.right: parent.right
-
-            itemWidth: mediaWidth/10
+            itemWidth: mediaWidth/11
             itemHeight: parent.height
             imgSrc: "Images/sound_on.png"
+
+            anchors.bottom: mediaController.bottom
+            anchors.verticalCenter: bottomRow.verticalCenter
 
             onClicked:
             {
@@ -221,39 +271,8 @@ ColumnLayout
             }
         }
 
-        Rectangle
-        {
-            id: volumeRect
 
-            //anchors.verticalCenter: bottomRow.verticalCenter
-            anchors.bottom: soundButton.top
-
-
-            x: soundButton.x + mediaWidth / 40
-            y: -1 * mediaController.height
-            width: mediaWidth / 20
-            height: topRow.height
-            color: "black"
-            visible: false
-
-            Slider
-            {
-                id: volumeSlider
-
-                width: parent.width
-                height: parent.height
-                minimumValue: 0
-                maximumValue: 100
-                value: 50
-                orientation: verticalCenter
-
-                onValueChanged:
-                {
-                    MediaHandler.setAudioVolume(value)
-                }
-            }
         }
 
-    }
 }
 

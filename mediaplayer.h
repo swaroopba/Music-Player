@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QMediaPlayer>
 #include <QFileInfo>
+#include <QImage>
 
 class MediaPlayer : public QObject
 {
@@ -41,6 +42,12 @@ public:
 
     void setAudioPosition(int timeInMs);
 
+    QString getTitleName();
+
+    QString getAuthorName();
+
+    QImage getThumbNailImage();
+
     int getAudioPosition();
 
     int getAudioDuration();
@@ -52,15 +59,20 @@ private slots:
 
     void emitDurationChanged(qint64 duration);
 
+    void emitMetaDataChanged();
+
 signals:
     void positionChanged(qint64 position);
     void durationChanged(qint64 duration);
     void playingCompleted();
     void loopCountChanged(qint16 num);
+    void metaDataObtained(QString title, QString author, QImage image);
 
 private:
     QMediaPlayer *m_player;
     QString m_fileName;
+    //QString m_titleName;
+    //QString m_authorName;
     int m_volume;
     int m_loopCount;
 };

@@ -1,4 +1,5 @@
 #include "mediaplayer.h"
+#include <QMediaMetaData>
 
 namespace
 {
@@ -14,11 +15,46 @@ MediaPlayer::MediaPlayer(QObject *parent) : QObject(parent)
     connect(m_player, SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(checkLooping(QMediaPlayer::State)));
     connect(m_player, SIGNAL(positionChanged(qint64)), this, SLOT(emitPositionChanged(qint64)));
     connect(m_player, SIGNAL(durationChanged(qint64)), this, SLOT(emitDurationChanged(qint64)));
+    connect(m_player, SIGNAL(metaDataChanged()), this, SLOT(emitMetaDataChanged()));
+
 }
 
 MediaPlayer::~MediaPlayer()
 {
     delete m_player;
+}
+
+void MediaPlayer::emitMetaDataChanged()
+{
+    emit metaDataObtained(getTitleName(), getAuthorName(), getThumbNailImage());
+}
+
+QString MediaPlayer::getTitleName()
+{
+    QString  title = "";
+    title = m_player->metaData("Title").toString();
+    if (title != "")
+    {
+        title = title.left(25)+"...";
+    }
+    return title;
+}
+
+QString MediaPlayer::getAuthorName()
+{
+    QString  author = "";
+    author = m_player->metaData("Author").toString();
+    if (author != "")
+    {
+        author = "-"+author.left(15)+"..";
+    }
+    return author;
+}
+
+QImage MediaPlayer::getThumbNailImage()
+{
+    QImage ret = m_player->metaData("ThumbnailImage").value<QImage>();
+    return ret;
 }
 
 void MediaPlayer::emitDurationChanged(qint64 position)

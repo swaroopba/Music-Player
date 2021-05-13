@@ -3,17 +3,42 @@
 MediaHandler::MediaHandler(QObject *parent) : QObject(parent)
 {
     m_mediaPlayerPtr = QSharedPointer<MediaPlayer>(new MediaPlayer);
+    m_imageProviderPtr = QSharedPointer<ImageProvider>(new ImageProvider);
 
     connect(m_mediaPlayerPtr.data(), SIGNAL(positionChanged(qint64)), this, SLOT(emitPositionChanged(qint64)));
     connect(m_mediaPlayerPtr.data(), SIGNAL(durationChanged(qint64)), this, SLOT(emitDurationChanged(qint64)));
     connect(m_mediaPlayerPtr.data(), SIGNAL(playingCompleted()), this, SLOT(emitPlayingCompleted()));
     connect(m_mediaPlayerPtr.data(), SIGNAL(loopCountChanged(qint16)), this, SLOT(emitLoopCountChanged(qint16)));
+    connect(m_mediaPlayerPtr.data(), SIGNAL(metaDataObtained(QString, QString, QImage)), this, SLOT(emitMetaDataObtained(QString, QString, QImage)));
+    //connect(this, SIGNAL(updateThumbNailImage(QImage)), m_imageProviderPtr.data(), SLOT(m_imageProviderPtr->onUpdateThumbNailImage(QImage)));
 
+}
+
+void MediaHandler::emitMetaDataObtained(QString title, QString author, QImage image)
+{
+    emit metaDataObtained(title, author, image);
+    emit m_imageProviderPtr->imageAvailable(image);
+    qDebug()<<"Is Thum null->"<<image.isNull();
+}
+
+ImageProvider* MediaHandler::getImageProvider()
+{
+    return m_imageProviderPtr.data();
 }
 
 void MediaHandler::emitLoopCountChanged(qint16 num)
 {
     emit loopCountChanged(num);
+}
+
+QString MediaHandler::getTitleName()
+{
+    return m_mediaPlayerPtr->getTitleName();
+}
+
+QString MediaHandler::getAuthorName()
+{
+    return m_mediaPlayerPtr->getAuthorName();
 }
 
 void MediaHandler::emitPlayingCompleted()
