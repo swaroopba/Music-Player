@@ -1,5 +1,6 @@
 #include "mediaplayer.h"
 #include <QMediaMetaData>
+#include <QDir>
 
 namespace
 {
@@ -35,7 +36,7 @@ QString MediaPlayer::getTitleName()
     title = m_player->metaData("Title").toString();
     if (title != "")
     {
-        title = title.left(25)+"...";
+        title = title.left(20)+"...";
     }
     return title;
 }
@@ -100,7 +101,7 @@ int MediaPlayer::getAudioDuration()
 void MediaPlayer::setFileName(const QString& fileName)
 {
     m_fileName = fileName;
-    m_player->setMedia(QUrl::fromLocalFile(QFileInfo((kRelativeFilePath + fileName)).absoluteFilePath()));
+    m_player->setMedia(QUrl::fromLocalFile(fileName));
     qDebug()<<m_player->media().request().url();
 }
 

@@ -1,9 +1,11 @@
 #include "mediahandler.h"
+#include <QDir>
 
 MediaHandler::MediaHandler(QObject *parent) : QObject(parent)
 {
     m_mediaPlayerPtr = QSharedPointer<MediaPlayer>(new MediaPlayer);
     m_imageProviderPtr = QSharedPointer<ImageProvider>(new ImageProvider);
+    m_fileModelPtr = QSharedPointer<FileModel>(new FileModel);
 
     connect(m_mediaPlayerPtr.data(), SIGNAL(positionChanged(qint64)), this, SLOT(emitPositionChanged(qint64)));
     connect(m_mediaPlayerPtr.data(), SIGNAL(durationChanged(qint64)), this, SLOT(emitDurationChanged(qint64)));
@@ -18,7 +20,7 @@ void MediaHandler::emitMetaDataObtained(QString title, QString author, QImage im
 {
     emit metaDataObtained(title, author, image);
     emit m_imageProviderPtr->imageAvailable(image);
-    qDebug()<<"Is Thum null->"<<image.isNull();
+    //qDebug()<<"Is Thum null->"<<image.isNull();
 }
 
 ImageProvider* MediaHandler::getImageProvider()
@@ -53,7 +55,7 @@ void MediaHandler::emitDurationChanged(qint64 dur)
 
 void MediaHandler::emitPositionChanged(qint64 pos)
 {
-    qDebug()<<"Position Change2";
+    //qDebug()<<"Position Change2";
     emit positionChanged(pos);
 }
 
@@ -69,7 +71,31 @@ int MediaHandler::getAudioPosition()
 
 void MediaHandler::setFileName(const QString& fileName)
 {
-    m_mediaPlayerPtr->setFileName(fileName);
+    m_mediaPlayerPtr->setFileName(m_fileModelPtr->getDirectory() + "/" + fileName);
+    m_currentSong = QPair<int, QString>(m_fileModelPtr->getSongIndex(fileName), fileName);
+}
+
+void MediaHandler::populateModel(const QString& dirPath)
+{
+    QDir directory(dirPath);
+    QStringList typeFilter;
+    typeFilter << "*.mp3";
+    directory.setNameFilters(typeFilter);
+    QStringList fileCollection = directory.entryList();
+
+    m_fileModelPtr->setDirectory(directory.absolutePath());
+    m_fileModelPtr->setModelData(fileCollection);
+    setFileName(fileCollection.at(0));
+}
+
+FileModel* MediaHandler::getModel()
+{
+    return m_fileModelPtr.data();
+}
+
+int MediaHandler::getCurrectPlayingSongIndex()
+{
+    return m_currentSong.first;
 }
 
 QString MediaHandler::getFileName()
@@ -80,6 +106,7 @@ QString MediaHandler::getFileName()
 void MediaHandler::playAudio()
 {
     m_mediaPlayerPtr->playAudio();
+    emit songStartedPlaying();
 }
 
 void MediaHandler::pauseAudio()

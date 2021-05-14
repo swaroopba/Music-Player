@@ -6,6 +6,7 @@
 #include "imageprovider.h"
 #include <QSharedPointer>
 #include <QImage>
+#include "filemodel.h"
 
 class MediaHandler : public QObject
 {
@@ -49,6 +50,12 @@ public:
 
     ImageProvider* getImageProvider();
 
+    void populateModel(const QString& dirPath);
+
+    Q_INVOKABLE FileModel* getModel();
+
+    Q_INVOKABLE int getCurrectPlayingSongIndex();
+
 signals:
 
     void positionChanged(qint64 pos);
@@ -57,6 +64,7 @@ signals:
     void loopCountChanged(qint16 num);
     void metaDataObtained(QString title, QString author, QImage img);
     void updateThumbNailImage(QImage);
+    void songStartedPlaying();
 
 public slots:
     void emitPositionChanged(qint64 pos);
@@ -69,6 +77,8 @@ private:
 
     QSharedPointer<MediaPlayer> m_mediaPlayerPtr;
     QSharedPointer<ImageProvider> m_imageProviderPtr;
+    QSharedPointer<FileModel> m_fileModelPtr;
+    QPair<int, QString> m_currentSong;
 };
 
 #endif // MEDIAHANDLER_H

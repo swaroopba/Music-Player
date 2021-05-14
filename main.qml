@@ -18,13 +18,10 @@ Window {
         anchors
         {
             top: mainWindow.top
-            bottom: mediaControl.top
+            left: mainWindow.left
         }
 
-//        title: mediaControl.titleName
-//        author: mediaControl.authorName
-
-        height: mainWindow.height * 3/4
+        height: mainWindow.height * 0.75
         width: mainWindow.width
     }
 
@@ -40,7 +37,7 @@ Window {
             bottomMargin: 20
         }
 
-        mediaHeight: mainWindow.height/4
+        mediaHeight: mainWindow.height*0.25
         mediaWidth: mainWindow.width
     }
 

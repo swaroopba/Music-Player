@@ -2,9 +2,9 @@ import QtQuick 2.0
 import QtQuick.Layouts 1.3
 import QtQuick.Controls 1.4
 
-ColumnLayout
+
+Rectangle
 {
-    id: mediaController
 
     property int mediaWidth: 20
     property int mediaHeight: 20
@@ -12,18 +12,28 @@ ColumnLayout
 
     property double durationSliderValue: 0
 
-//    property string titleName: ""
-//    property string authorName: ""
-
     property bool isPlaying: false;
+    property bool isShuffleOn: false;
 
-    width: mediaController.mediaWidth
-    height: mediaController.mediaHeight
+    width: mediaWidth
+    height: mediaHeight
 
-    onMediaHeightChanged: console.log("Changed ht->"+mediaHeight)
-    onMediaWidthChanged: console.log("Changed wt->"+mediaWidth)
-    //onTitleNameChanged: console.log("Changed title"+ titleName)
+    //color: "black"
 
+    gradient: Gradient
+    {
+        GradientStop { position: 0.0; color: "#4f4d4d" }
+        GradientStop { position: 1.0; color: "#3d3b3b" }
+    }
+
+ColumnLayout
+{
+    id: mediaController
+
+
+
+    width: parent.mediaWidth
+    height: parent.mediaHeight
 
     Timer
     {
@@ -33,7 +43,6 @@ ColumnLayout
         {
             if (running == false)
             {
-                //console.log("timer destroted")
                 if (volumeSlider.pressed === true)
                 {
                     volumeTimer.restart()
@@ -64,15 +73,29 @@ ColumnLayout
 
         function onPlayingCompleted()
         {
-            isPlaying = false
+            isPlaying = false;
         }
 
         function onLoopCountChanged(number)
         {
             loopCount = number
         }
+
+        function onSongStartedPlaying()
+        {
+            isPlaying = true;
+        }
     }
 
+
+    function playSongByIndex(index)
+    {
+        if (index < FileModel.getTotalSongsCount() && index >= 0)
+        {
+            MediaHandler.setFileName(FileModel.getSongName(index))
+            MediaHandler.playAudio()
+        }
+    }
 
     Rectangle
     {
@@ -80,7 +103,7 @@ ColumnLayout
 
         width: mediaController.mediaWidth
         height: mediaController.mediaHeight/2
-        color: "green"
+        color: "black"
 
         anchors
         {
@@ -95,8 +118,6 @@ ColumnLayout
 
             anchors
             {
-                //left: parent.left
-                //right: parent.right
                 verticalCenter: topRow.verticalCenter
             }
 
@@ -122,22 +143,55 @@ ColumnLayout
 
         width: mediaController.mediaWidth
         height: mediaController.mediaHeight/2
-        spacing: mediaController.mediaWidth/1000
+        spacing: (loopButton.itemWidth < 100) ? 4 : 20
 
         anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: (loopButton.itemWidth < 100) ? 15 : 60
 
         MediaButton
         {
+            id: shuffleButton
+
             itemWidth: mediaWidth/11
             itemHeight: parent.height
-            imgSrc: "Images/shuffle_light.png"
+            imgSrc: isShuffleOn ? "Images/shuffle_dark.png" : "Images/shuffle_light.png"
+
+            scale: (loopButton.itemWidth < 100) ? loopButton.itemWidth/90 : 1
+
+            onClicked:
+            {
+                isShuffleOn = !isShuffleOn
+            }
         }
 
         MediaButton
         {
+            id: previousButton
+
             itemWidth: mediaWidth/11
             itemHeight: parent.height
             imgSrc: "Images/previous.png"
+
+            scale: (loopButton.itemWidth < 100) ? loopButton.itemWidth/90 : 1
+
+            onClicked:
+            {
+                var prevIndex
+                var currentIndex = MediaHandler.getCurrectPlayingSongIndex();
+                if (isShuffleOn)
+                {
+                    var maxSongs = FileModel.getTotalSongsCount()
+                    var random = Math.floor((Math.random() * (maxSongs-1)) + 1);
+                    random = random % maxSongs;
+                    prevIndex = random
+                }
+                else
+                {
+                    prevIndex = currentIndex - 1
+                }
+            }
+
         }
 
         MediaButton
@@ -148,47 +202,71 @@ ColumnLayout
             itemHeight: parent.height
             imgSrc: isPlaying ? "Images/pause.png" :"Images/play.png"
 
+            scale: (loopButton.itemWidth < 100) ? loopButton.itemWidth/90 : 1
+
             onClicked:
             {
-                var playingState = MediaHandler.getPlayingState()
-                var playingDuration
-                if (playingState === "Stopped")
+                if (MediaHandler.getFileName() !== "")
                 {
-                    MediaHandler.setFileName("Pokemon.mp3")
-                    //authorName = MediaHandler.getAuthorName()
-                    //titleName = MediaHandler.getTitleName()
+                    var playingState = MediaHandler.getPlayingState()
+                    var playingDuration
+                    if (playingState === "Stopped")
+                    {
 
-                    playingDuration = MediaHandler.getDuration()
+                        playingDuration = MediaHandler.getDuration()
+                        MediaHandler.playAudio()
+                        isPlaying = true
+                    }
+                    else if(playingState === "Playing")
+                    {
+                        MediaHandler.pauseAudio()
+                        isPlaying = false
 
-                    //console.log("Playing Duration->"+playingDuration)
-
-                    //durationSlider.maximumValue = playingDuration
-                    MediaHandler.playAudio()
-                    isPlaying = true
-                }
-                else if(playingState === "Playing")
-                {
-                    MediaHandler.pauseAudio()
-                    isPlaying = false
-
-                }
-                else {
-                    MediaHandler.playAudio()
-                    isPlaying = true
+                    }
+                    else
+                    {
+                        MediaHandler.playAudio()
+                        isPlaying = true
+                    }
                 }
             }
         }
 
         MediaButton
         {
+            id: nextButton
+
             itemWidth: mediaWidth/11
             itemHeight: parent.height
             imgSrc: "Images/next.png"
+
+            scale: (loopButton.itemWidth < 100) ? loopButton.itemWidth/90 : 1
+
+            onClicked:
+            {
+                var currentIndex = MediaHandler.getCurrectPlayingSongIndex();
+                var nextIndex;
+                if (isShuffleOn)
+                {
+                    var maxSongs = FileModel.getTotalSongsCount()
+                    var random = Math.floor((Math.random() * (maxSongs-1)) + 1);
+                    random = random % maxSongs;
+                    nextIndex = random
+                }
+                else
+                {
+                    nextIndex = currentIndex + 1
+                }
+
+                playSongByIndex(nextIndex)
+            }
         }
 
         MediaButton
         {
             id: loopButton
+
+            scale: (loopButton.itemWidth < 100) ? loopButton.itemWidth/90 : 1
 
             itemWidth: mediaWidth/11
             itemHeight: parent.height
@@ -204,54 +282,74 @@ ColumnLayout
     }
 
 
-        ColumnLayout
+    ColumnLayout
+    {
+
+        width: loopButton.width
+        height: 2 * mediaController.height
+
+        //scale: (mediaController.mediaWidth/11 < 100) ? (mediaController.mediaWidth/9)/90 : 1
+
+        anchors
         {
 
-            width: mediaWidth/11
-            height: mediaController.height
-            anchors
-            {
+            right: mediaController.right
+            bottom: bottomRow.bottom
+            rightMargin: (loopButton.itemWidth < 100) ? 15 : 60
 
-                right: mediaController.right
-                top: topRow.top
-                rightMargin: 10
+        }
+
+        Item
+        {
+            height: 2 * mediaController.height - bottomRow.height
+            width: soundButton.width
+            visible: !volumeRect.visible
+
+            scale: (loopButton.itemWidth < 100) ? loopButton.itemWidth/90 : 1
+
+            //scale: (loopButton.itemWidth < 100) ? loopButton.itemWidth/90 : 1
+        }
+
+        Rectangle
+        {
+            id: volumeRect
+
+            anchors.bottom: soundButton.top
+            anchors.bottomMargin: (loopButton.itemWidth < 100) ? -1 * loopButton.itemWidth/4 : 1
+
+            scale: (loopButton.itemWidth < 100) ? loopButton.itemWidth/90 : 1
+
+            radius: 1
+            //border.color: "black"
+
+            width: soundButton.itemWidth
+            height:  mediaController.height + topRow.height + (bottomRow.height/2 - soundButton.height/2)
+            //color: "grey"
+            visible: false
+
+            gradient: Gradient
+            {
+                GradientStop { position: 0.0; color: "#a8a7a7" }
+                GradientStop { position: 1.0; color: "#949191" }
             }
 
-            Item
+            Slider
             {
-                height: mediaController.height - bottomRow.height
-                width: soundButton.width
-                visible: !volumeRect.visible
-            }
+                id: volumeSlider
 
-            Rectangle
-            {
-                id: volumeRect
+                width: parent.width
+                height: parent.height
+                minimumValue: 0
+                maximumValue: 100
+                value: 50
+                orientation: 0
 
-                anchors.bottom: soundButton.top
-
-                width: soundButton.itemWidth
-                height: topRow.height + (bottomRow.height/2 - soundButton.height/2)
-                color: "black"
-                visible: false
-
-                Slider
+                onValueChanged:
                 {
-                    id: volumeSlider
-
-                    width: parent.width
-                    height: parent.height
-                    minimumValue: 0
-                    maximumValue: 100
-                    value: 50
-                    orientation: 0
-
-                    onValueChanged:
-                    {
-                        MediaHandler.setAudioVolume(value)
-                    }
+                    MediaHandler.setAudioVolume(value)
                 }
             }
+        }
 
         MediaButton
         {
@@ -261,7 +359,11 @@ ColumnLayout
             itemHeight: parent.height
             imgSrc: "Images/sound_on.png"
 
-            anchors.bottom: mediaController.bottom
+
+            scale: (loopButton.itemWidth < 100) ? loopButton.itemWidth/90 : 1
+
+            //anchors.bottom: mediaController.bottom
+            anchors.top: loopButton.top
             anchors.verticalCenter: bottomRow.verticalCenter
 
             onClicked:
@@ -271,8 +373,7 @@ ColumnLayout
             }
         }
 
+    }
 
-        }
-
-}
+}}
 

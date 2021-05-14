@@ -21,7 +21,9 @@ int main(int argc, char *argv[])
     QSharedPointer<MediaHandler> m_mediaHandlerPtr = QSharedPointer<MediaHandler>(new MediaHandler);
     engine.rootContext()->setContextProperty("MediaHandler", m_mediaHandlerPtr.data() );
     engine.rootContext()->setContextProperty("ImageProvider", m_mediaHandlerPtr->getImageProvider());
+    engine.rootContext()->setContextProperty("FileModel", m_mediaHandlerPtr->getModel());
     engine.addImageProvider("imageprovider", m_mediaHandlerPtr->getImageProvider());
+    m_mediaHandlerPtr->populateModel("../../MediaPlayer/Audio");
 
     engine.load(url);
 

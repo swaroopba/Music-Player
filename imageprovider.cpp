@@ -30,6 +30,6 @@ QImage ImageProvider::requestImage(const QString &id, QSize *size, const QSize &
 void ImageProvider::onUpdateThumbNailImage(QImage image)
 {
     m_image = image;
-    qDebug()<<"Reached in ImageProviderClass";
+    //qDebug()<<"Reached in ImageProviderClass";
     emit updateThumbNailImage();
 }
