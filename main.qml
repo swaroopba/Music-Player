@@ -11,6 +11,8 @@ Window {
     title: qsTr("Media Player")
     color: "grey"
 
+
+
     DisplayScreen
     {
         id: displayScreen

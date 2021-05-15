@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<RCC>
+    <qresource prefix="/">
+        <file alias="MediaButton.qml">../MediaButton.qml</file>
+        <file alias="MediaControl.qml">../MediaControl.qml</file>
+        <file alias="main.qml">../main.qml</file>
+        <file alias="Images">../Images</file>
+        <file alias="DisplayScreen.qml">../DisplayScreen.qml</file>
+    </qresource>
+</RCC>

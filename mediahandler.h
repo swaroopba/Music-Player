@@ -62,7 +62,7 @@ signals:
     void durationChanged(qint64 duration);
     void playingCompleted();
     void loopCountChanged(qint16 num);
-    void metaDataObtained(QString title, QString author, QImage img);
+    void metaDataObtained(QString title, QString author, int index);
     void updateThumbNailImage(QImage);
     void songStartedPlaying();
 

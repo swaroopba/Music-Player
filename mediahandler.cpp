@@ -18,7 +18,8 @@ MediaHandler::MediaHandler(QObject *parent) : QObject(parent)
 
 void MediaHandler::emitMetaDataObtained(QString title, QString author, QImage image)
 {
-    emit metaDataObtained(title, author, image);
+    qDebug()<<"song requested->"<<m_currentSong.second;
+    emit metaDataObtained(title, author, m_currentSong.first);
     emit m_imageProviderPtr->imageAvailable(image);
     //qDebug()<<"Is Thum null->"<<image.isNull();
 }

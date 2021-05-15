@@ -8,6 +8,8 @@ int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
+    qDebug()<<"Command arg count->"<<argc;
+
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;

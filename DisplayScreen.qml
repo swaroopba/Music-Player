@@ -10,6 +10,8 @@ Rectangle
     property string imgsrc: ""
     property int imageHeight: displayScreen.height/2
     property int imageWidth: displayScreen.width/2
+    property bool isListVisible: false
+    property int previousIndex: 0;
 
     gradient: Gradient
     {
@@ -24,10 +26,20 @@ Rectangle
     {
         target: MediaHandler
 
-        function onMetaDataObtained(titleName, authorName, image)
+        function onMetaDataObtained(titleName, authorName, songIndex)
         {
             displayScreen.title = titleName;
             displayScreen.author = authorName;
+
+            //make previous background disappper before setting new one
+            var sample1 = songsList.itemAtIndex(previousIndex);
+            sample1.border.width = 0
+            sample1.border.color = "transparent"
+
+            var sample = songsList.itemAtIndex(songIndex);
+            sample.border.width = 2
+            sample.border.color = "white"
+            previousIndex = songIndex
         }
     }
 
@@ -47,32 +59,78 @@ Rectangle
         return String(songName).slice(0, 12);
     }
 
+    function changeBorder(index)
+    {
+        var sample = songsList.itemAtIndex(index);
+        sample.border.width = 0
+        sample.border.color = "transparent"
+    }
+
+    Rectangle
+    {
+        id: nextButton
+
+        height: (displayScreen.height < 500) ? displayScreen.height/10 : displayScreen.height/15
+        width: (displayScreen.width < 1000) ? 18 : 24
+
+        color: "red"
+
+        anchors
+        {
+            left: songsList.right
+            top: songsList.top
+            topMargin: songsList.height/10
+            leftMargin: 0//(displayScreen.width < 1000) ? 0 : -1 * displayScreen.width/12
+        }
+
+
+        Text
+        {
+            text: qsTr("NEXT")
+            rotation: 270
+
+            anchors.left: nextButton.left
+            anchors.leftMargin: -8
+            anchors.top: nextButton.top
+            anchors.topMargin: 14
+
+            color: "white"
+        }
+
+        MouseArea
+        {
+            anchors.fill: parent
+            onClicked:
+            {
+                isListVisible = !isListVisible
+            }
+        }
+    }
+
     ListView
     {
         id: songsList
 
-        height: parent.height
-        width: parent.width/4
-
+        height: parent.height * 2/3
+        width: (displayScreen.width < 1000) ? displayScreen.width/4 : displayScreen.width/6
 
         anchors
         {
             left: displayScreen.left
-            top: displayScreen.top
+            top: authorName.bottom
+            leftMargin: isListVisible ? 0 : -1 * songsList.width
         }
 
-//        ScrollBar {
-//                id: vbar
-//                hoverEnabled: true
-//                active: hovered || pressed
-//                orientation: Qt.Vertical
-//                size: frame.height / content.height
-//                anchors.top: parent.top
-//                anchors.right: parent.right
-//                anchors.bottom: parent.bottom
-//            }
-
         model: FileModel
+
+        ScrollBar.vertical: ScrollBar
+        {
+            active: true
+            anchors.left: songsList.right
+            anchors.leftMargin: 0
+
+            visible: isListVisible
+        }
 
         delegate:
             Rectangle
@@ -85,10 +143,10 @@ Rectangle
                  GradientStop { position: 1.0; color: "#1c0191" }
              }
 
-            width: displayScreen.width/4
-            height: displayScreen.height/8
-            border.color: "white"
-            border.width: 2
+            opacity: 0.6
+
+            width: (displayScreen.width < 1000) ? displayScreen.width/4 : displayScreen.width/6
+            height: (displayScreen.height < 500) ? displayScreen.height/7 : displayScreen.height/10
 
             Text
             {
@@ -99,8 +157,11 @@ Rectangle
 
                 anchors
                 {
-                    verticalCenter: rect.verticalCenter
-                    horizontalCenter:rect.horizontalCenter
+                    top: rect.top
+                    left: rect.left
+                    topMargin: 5
+                    leftMargin: 5
+
                 }
             }
 
@@ -111,6 +172,7 @@ Rectangle
 
                 onClicked:
                 {
+
                     MediaHandler.setFileName(songName)
                     MediaHandler.playAudio()
                 }

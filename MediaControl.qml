@@ -18,12 +18,19 @@ Rectangle
     width: mediaWidth
     height: mediaHeight
 
-    //color: "black"
-
     gradient: Gradient
     {
         GradientStop { position: 0.0; color: "#4f4d4d" }
         GradientStop { position: 1.0; color: "#3d3b3b" }
+    }
+
+    function playSongByIndex(index)
+    {
+        if (index < FileModel.getTotalSongsCount() && index >= 0)
+        {
+            MediaHandler.setFileName(FileModel.getSongName(index))
+            MediaHandler.playAudio()
+        }
     }
 
 ColumnLayout
@@ -84,16 +91,6 @@ ColumnLayout
         function onSongStartedPlaying()
         {
             isPlaying = true;
-        }
-    }
-
-
-    function playSongByIndex(index)
-    {
-        if (index < FileModel.getTotalSongsCount() && index >= 0)
-        {
-            MediaHandler.setFileName(FileModel.getSongName(index))
-            MediaHandler.playAudio()
         }
     }
 
