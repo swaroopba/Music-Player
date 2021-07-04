@@ -8,19 +8,25 @@ FileModel::FileModel(QObject *parent)
 void FileModel::setModelData(QStringList fileNames)
 {
     int i = 0;
+    qDebug("Called from setModelData");
+    beginResetModel();
     foreach(QString file, fileNames)
-    {
+    {   qDebug("Adding new file");
         m_fileNames.push_back(QPair<int, QString>(i, file));
         i++;
     }
+    endResetModel();
 }
 
 QStringList FileModel::getModelData()
 {
     QStringList ret;
     QPair<int, QString> item;
+    qDebug("Called from getModelData");
+
     foreach(item, m_fileNames)
     {
+        qDebug("Item..");
         ret.push_back(item.second);
     }
 

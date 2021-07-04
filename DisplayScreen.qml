@@ -1,17 +1,20 @@
 import QtQuick 2.0
+import QtQuick.Dialogs 1.0
 import QtQuick.Controls 2.2
 
 Rectangle
 {
     id: displayScreen
 
-    property string title: ""
-    property string author: ""
+    property string title: "title"
+    property string author: "author"
     property string imgsrc: ""
     property int imageHeight: displayScreen.height/2
     property int imageWidth: displayScreen.width/2
     property bool isListVisible: false
     property int previousIndex: 0;
+    property string clickedBgColor: "black"
+    property string releasedBgColor: "red"
 
     gradient: Gradient
     {
@@ -188,7 +191,7 @@ Rectangle
 
         anchors.horizontalCenter: displayScreen.horizontalCenter
         anchors.top: displayScreen.top
-        anchors.topMargin: 10
+        anchors.topMargin: 0
 
         font.family: "Helvetica"; font.pointSize: 20;
         color: "white"
@@ -198,9 +201,6 @@ Rectangle
     Text
     {
         id: authorName
-
-        //width: displayScreen.width/2
-        //height: 20
 
         anchors
         {
@@ -212,6 +212,52 @@ Rectangle
         font.family: "Helvetica"; font.pointSize: 15;
 
         text: author
+    }
+
+    Rectangle
+    {
+        height: displayScreen.height/10
+        width: displayScreen.width/6
+        color: "red"
+
+        Text
+        {
+            id: title
+            text: qsTr("Choose your song!")
+            color: "white"
+            font.family: "Helvetica"; font.pointSize: 10;
+            anchors.centerIn: parent
+        }
+
+        MouseArea
+        {
+            anchors.fill: parent
+            onClicked: fileSelector.visible = true
+        }
+
+         anchors
+         {
+              horizontalCenter: displayScreen.horizontalCenter
+              top: displayImage.bottom
+         }
+    }
+
+    FileDialog
+    {
+        id: fileSelector
+        title: "Select your song"
+        folder: shortcuts.music
+        nameFilters: "*.mp3"
+        onAccepted:
+        {
+            var path = fileSelector.fileUrl.toString();
+            path = path.replace(/^(file:\/{3})/,"");
+            var folder = fileSelector.folder.toString();
+            folder = folder.replace(/^(file:\/{3})/,"");
+            MediaHandler.setFileName(path)
+            MediaHandler.populateModel(folder)
+        }
+
     }
 
     Image

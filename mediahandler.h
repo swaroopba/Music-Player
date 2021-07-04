@@ -50,7 +50,7 @@ public:
 
     ImageProvider* getImageProvider();
 
-    void populateModel(const QString& dirPath);
+    Q_INVOKABLE void populateModel(const QString& dirPath);
 
     Q_INVOKABLE FileModel* getModel();
 

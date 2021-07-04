@@ -102,7 +102,6 @@ void MediaPlayer::setFileName(const QString& fileName)
 {
     m_fileName = fileName;
     m_player->setMedia(QUrl::fromLocalFile(fileName));
-    qDebug()<<m_player->media().request().url();
 }
 
 QString MediaPlayer::getFileName()

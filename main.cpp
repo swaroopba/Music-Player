@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("ImageProvider", m_mediaHandlerPtr->getImageProvider());
     engine.rootContext()->setContextProperty("FileModel", m_mediaHandlerPtr->getModel());
     engine.addImageProvider("imageprovider", m_mediaHandlerPtr->getImageProvider());
-    m_mediaHandlerPtr->populateModel("../../MediaPlayer/Audio");
+    //m_mediaHandlerPtr->populateModel("../../MediaPlayer/Audio");
 
     engine.load(url);
 

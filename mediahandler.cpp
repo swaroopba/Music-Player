@@ -72,7 +72,8 @@ int MediaHandler::getAudioPosition()
 
 void MediaHandler::setFileName(const QString& fileName)
 {
-    m_mediaPlayerPtr->setFileName(m_fileModelPtr->getDirectory() + "/" + fileName);
+    qDebug()<<"file Name->"<<fileName;
+    m_mediaPlayerPtr->setFileName(fileName);
     m_currentSong = QPair<int, QString>(m_fileModelPtr->getSongIndex(fileName), fileName);
 }
 
@@ -83,10 +84,10 @@ void MediaHandler::populateModel(const QString& dirPath)
     typeFilter << "*.mp3";
     directory.setNameFilters(typeFilter);
     QStringList fileCollection = directory.entryList();
+    qDebug()<<"file Collection"<<fileCollection;
 
     m_fileModelPtr->setDirectory(directory.absolutePath());
     m_fileModelPtr->setModelData(fileCollection);
-    setFileName(fileCollection.at(0));
 }
 
 FileModel* MediaHandler::getModel()
